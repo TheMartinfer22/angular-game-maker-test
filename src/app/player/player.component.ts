@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { GameDataService } from '../service/game-data.service';
-import {NgClass} from "@angular/common";
+import { NgClass } from "@angular/common";
 
 @Component({
   selector: 'app-player',
@@ -12,8 +12,9 @@ import {NgClass} from "@angular/common";
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent implements OnInit {
-  playerPosition = { x: 50, y: 50};
-  velocity = 5;
+  playerPosition = { x: 50, y: 50 };
+  baseVelocity = 5;
+  velocity = this.baseVelocity;
   sceneWidth = 800;
   sceneHeight = 600;
   playerColor: string = 'green';
@@ -50,10 +51,13 @@ export class PlayerComponent implements OnInit {
         this.changePlayerColor('green');
         break;
       case '1':
-        this.increasePlayerSize()
+        this.increasePlayerSize();
         break;
       case '2':
-        this.diminutivePlayerSize()
+        this.diminutivePlayerSize();
+        break;
+      case 'Shift':
+        this.handleShiftPress(true);
         break;
     }
 
@@ -64,17 +68,28 @@ export class PlayerComponent implements OnInit {
     this.gameDataService.atualizarPosicaoJogador(this.playerPosition);
   }
 
+  @HostListener('document:keyup', ['$event'])
+  handleKeyUp(event: KeyboardEvent): void {
+    if (event.key === 'Shift') {
+      this.handleShiftPress(false);
+    }
+  }
+
   private changePlayerColor(color: string): void {
     this.playerColor = color;
   }
 
-  private increasePlayerSize() {
+  private increasePlayerSize(): void {
     this.playerHeight = this.playerWidth + 10;
     this.playerWidth = this.playerWidth + 10;
   }
 
-  private diminutivePlayerSize() {
+  private diminutivePlayerSize(): void {
     this.playerHeight = this.playerWidth - 10;
     this.playerWidth = this.playerWidth - 10;
+  }
+
+  private handleShiftPress(isPressed: boolean): void {
+    this.velocity = isPressed ? this.baseVelocity * 4 : this.baseVelocity;
   }
 }
